@@ -1754,6 +1754,30 @@ setTimeout(function(){gerarProdutosDasPrestacoes();},500);
   });
   if(changed)DB.s('collabs',cols);
 })();
+// Pré-carrega todos os PDFs de cardápios na memória ao iniciar
+function initCardapios(){
+  if(!window._cPdfs)window._cPdfs={};
+  try{
+    var cards=DB.g('cardapios');
+    cards.forEach(function(cd){
+      if(window._cPdfs[cd.cv_id])return; // já carregado
+      var compressed=localStorage.getItem('cda_card_pdf_'+cd.cv_id);
+      if(!compressed)return;
+      try{
+        var b64=LZString.decompressFromUTF16(compressed);
+        if(!b64)return;
+        var arr=b64.split(',');
+        var byteStr=atob(arr[1]);
+        var ab=new ArrayBuffer(byteStr.length);
+        var ia=new Uint8Array(ab);
+        for(var i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
+        var blob=new Blob([ab],{type:'application/pdf'});
+        window._cPdfs[cd.cv_id]=URL.createObjectURL(blob);
+      }catch(e){console.warn('Cardápio '+cd.cv_id+' não carregado:',e);}
+    });
+  }catch(e){}
+}
+initCardapios();
 go('dash');
 
 function gerarProdutosDasPrestacoes(){
@@ -1891,27 +1915,7 @@ function restaurarBackup(el){
 
 var _cpUrl=null;
 function rCardapios(){
-  if(!window._cPdfs)window._cPdfs={};
-(function loadCardPdfs(){
-  try{
-    var cards=DB.g('cardapios');
-    cards.forEach(function(cd){
-      var compressed=localStorage.getItem('cda_card_pdf_'+cd.cv_id);
-      if(!compressed)return;
-      try{
-        var b64=LZString.decompressFromUTF16(compressed);
-        if(!b64)return;
-        var arr=b64.split(',');
-        var byteStr=atob(arr[1]);
-        var ab=new ArrayBuffer(byteStr.length);
-        var ia=new Uint8Array(ab);
-        for(var i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
-        var blob=new Blob([ab],{type:'application/pdf'});
-        window._cPdfs[cd.cv_id]=URL.createObjectURL(blob);
-      }catch(e){console.warn('Cardápio '+cd.cv_id+' não carregado:',e);}
-    });
-  }catch(e){}
-})();
+  initCardapios();
   var cvs=getCVS();
   var cards=DB.g('cardapios');
   var tbody=document.getElementById('card-tb');
