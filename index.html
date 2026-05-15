@@ -1996,10 +1996,32 @@ function reimpCardapio(cvId){
   var inp=document.createElement('input');inp.type='file';inp.accept='.pdf';
   inp.onchange=function(){
     var f=inp.files[0];if(!f)return;
-    if(!window._cPdfs)window._cPdfs={};
-    if(window._cPdfs[cvId])URL.revokeObjectURL(window._cPdfs[cvId]);
-    window._cPdfs[cvId]=URL.createObjectURL(f);
-    rCardapios();toast('PDF reimportado!','ok');
+    toast('Salvando PDF permanentemente...','ok');
+    var reader=new FileReader();
+    reader.onload=function(e){
+      var b64=e.target.result;
+      try{
+        var compressed=LZString.compressToUTF16(b64);
+        try{localStorage.setItem('cda_card_pdf_'+cvId,compressed);}
+        catch(quota){toast('Armazenamento cheio! Delete outros cardápios primeiro.');return;}
+        var cards=DB.g('cardapios');
+        var idx=cards.findIndex(function(x){return x.cv_id==cvId;});
+        var obj={cv_id:cvId,criado:new Date().toLocaleDateString('pt-BR'),temPdf:true};
+        if(idx>=0)cards[idx]=obj;else cards.push(obj);
+        DB.s('cardapios',cards);
+        if(!window._cPdfs)window._cPdfs={};
+        if(window._cPdfs[cvId])URL.revokeObjectURL(window._cPdfs[cvId]);
+        var arr=b64.split(',');
+        var byteStr=atob(arr[1]);
+        var ab=new ArrayBuffer(byteStr.length);
+        var ia=new Uint8Array(ab);
+        for(var i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
+        var blob=new Blob([ab],{type:'application/pdf'});
+        window._cPdfs[cvId]=URL.createObjectURL(blob);
+        rCardapios();toast('PDF salvo permanentemente!','ok');
+      }catch(err){toast('Erro: '+err.message);}
+    };
+    reader.readAsDataURL(f);
   };
   inp.click();
 }
