@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ciclo da Arte — Gestão</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+<script>var LZString=(function(){var f=String.fromCharCode;var keyStrBase64='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';var keyStrUriSafe='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$';var baseReverseDic={};function getBaseValue(alphabet,character){if(!baseReverseDic[alphabet]){baseReverseDic[alphabet]={};for(var i=0;i<alphabet.length;i++){baseReverseDic[alphabet][alphabet.charAt(i)]=i}}return baseReverseDic[alphabet][character]}var LZString={compressToBase64:function(input){if(input==null)return"";var res=LZString._compress(input,6,function(a){return keyStrBase64.charAt(a)});switch(res.length%4){default:case 0:return res;case 1:return res+"===";case 2:return res+"==";case 3:return res+"="}},decompressFromBase64:function(input){if(input==null)return"";if(input=="")return null;return LZString._decompress(input.length,32,function(index){return getBaseValue(keyStrBase64,input.charAt(index))})},compressToUTF16:function(input){if(input==null)return"";return LZString._compress(input,15,function(a){return f(a+32)})+" "},decompressFromUTF16:function(compressed){if(compressed==null)return"";if(compressed=="")return null;return LZString._decompress(compressed.length,16384,function(index){return compressed.charCodeAt(index)-32})},compress:function(uncompressed){return LZString._compress(uncompressed,16,function(a){return f(a)})},_compress:function(uncompressed,bitsPerChar,getCharFromInt){if(uncompressed==null)return"";var i,value,context_dictionary={},context_dictionaryToCreate={},context_c="",context_wc="",context_w="",context_enlargeIn=2,context_dictSize=3,context_numBits=2,context_data=[],context_data_val=0,context_data_position=0,ii;for(ii=0;ii<uncompressed.length;ii+=1){context_c=uncompressed.charAt(ii);if(!Object.prototype.hasOwnProperty.call(context_dictionary,context_c)){context_dictionary[context_c]=context_dictSize++;context_dictionaryToCreate[context_c]=true}context_wc=context_w+context_c;if(Object.prototype.hasOwnProperty.call(context_dictionary,context_wc)){context_w=context_wc}else{if(Object.prototype.hasOwnProperty.call(context_dictionaryToCreate,context_w)){if(context_w.charCodeAt(0)<256){for(i=0;i<context_numBits;i++){context_data_val=(context_data_val<<1);if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0}else{context_data_position++}}value=context_w.charCodeAt(0);for(i=0;i<8;i++){context_data_val=(context_data_val<<1)|(value&1);if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0}else{context_data_position++}value=value>>1}}else{value=1;for(i=0;i<context_numBits;i++){context_data_val=(context_data_val<<1)|value;if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0}else{context_data_position++}value=0}value=context_w.charCodeAt(0);for(i=0;i<16;i++){context_data_val=(context_data_val<<1)|(value&1);if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0}else{context_data_position++}value=value>>1}}delete context_dictionaryToCreate[context_w];context_enlargeIn--;if(context_enlargeIn==0){context_enlargeIn=Math.pow(2,context_numBits);context_numBits++}}else{value=context_dictionary[context_w];for(i=0;i<context_numBits;i++){context_data_val=(context_data_val<<1)|(value&1);if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0}else{context_data_position++}value=value>>1}context_enlargeIn--;if(context_enlargeIn==0){context_enlargeIn=Math.pow(2,context_numBits);context_numBits++}}context_dictionary[context_wc]=context_dictSize++;context_w=String(context_c)}}if(context_w!==""){if(Object.prototype.hasOwnProperty.call(context_dictionaryToCreate,context_w)){if(context_w.charCodeAt(0)<256){for(i=0;i<context_numBits;i++){context_data_val=(context_data_val<<1);if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0}else{context_data_position++}}value=context_w.charCodeAt(0);for(i=0;i<8;i++){context_data_val=(context_data_val<<1)|(value&1);if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0}else{context_data_position++}value=value>>1}}else{value=1;for(i=0;i<context_numBits;i++){context_data_val=(context_data_val<<1)|value;if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0}else{context_data_position++}value=0}value=context_w.charCodeAt(0);for(i=0;i<16;i++){context_data_val=(context_data_val<<1)|(value&1);if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0}else{context_data_position++}value=value>>1}}delete context_dictionaryToCreate[context_w]}else{value=context_dictionary[context_w];for(i=0;i<context_numBits;i++){context_data_val=(context_data_val<<1)|(value&1);if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0}else{context_data_position++}value=value>>1}context_enlargeIn--;if(context_enlargeIn==0){context_enlargeIn=Math.pow(2,context_numBits);context_numBits++}}value=2;for(i=0;i<context_numBits;i++){context_data_val=(context_data_val<<1)|(value&1);if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0}else{context_data_position++}value=value>>1}while(true){context_data_val=(context_data_val<<1);if(context_data_position==bitsPerChar-1){context_data.push(getCharFromInt(context_data_val));break}else{context_data_position++}}return context_data.join("")},decompress:function(compressed){if(compressed==null)return"";if(compressed=="")return null;return LZString._decompress(compressed.length,32768,function(index){return compressed.charCodeAt(index)})},_decompress:function(length,resetValue,getNextValue){var dictionary=[],next,enlargeIn=4,dictSize=4,numBits=3,entry="",result=[],i,w,bits,resb,maxpower,power,c,data={val:getNextValue(0),position:resetValue,index:1};for(i=0;i<3;i+=1){dictionary[i]=i}bits=0;maxpower=Math.pow(2,2);power=1;while(power!=maxpower){resb=data.val&data.position;data.position>>=1;if(data.position==0){data.position=resetValue;data.val=getNextValue(data.index++)}bits|=(resb>0?1:0)*power;power<<=1}switch(next=bits){case 0:bits=0;maxpower=Math.pow(2,8);power=1;while(power!=maxpower){resb=data.val&data.position;data.position>>=1;if(data.position==0){data.position=resetValue;data.val=getNextValue(data.index++)}bits|=(resb>0?1:0)*power;power<<=1}c=f(bits);break;case 1:bits=0;maxpower=Math.pow(2,16);power=1;while(power!=maxpower){resb=data.val&data.position;data.position>>=1;if(data.position==0){data.position=resetValue;data.val=getNextValue(data.index++)}bits|=(resb>0?1:0)*power;power<<=1}c=f(bits);break;case 2:return""}w=c;dictionary[3]=c;result.push(c);while(true){if(data.index>length){return""}bits=0;maxpower=Math.pow(2,numBits);power=1;while(power!=maxpower){resb=data.val&data.position;data.position>>=1;if(data.position==0){data.position=resetValue;data.val=getNextValue(data.index++)}bits|=(resb>0?1:0)*power;power<<=1}switch(c=bits){case 0:bits=0;maxpower=Math.pow(2,8);power=1;while(power!=maxpower){resb=data.val&data.position;data.position>>=1;if(data.position==0){data.position=resetValue;data.val=getNextValue(data.index++)}bits|=(resb>0?1:0)*power;power<<=1}dictionary[dictSize++]=f(bits);c=dictSize-1;enlargeIn--;break;case 1:bits=0;maxpower=Math.pow(2,16);power=1;while(power!=maxpower){resb=data.val&data.position;data.position>>=1;if(data.position==0){data.position=resetValue;data.val=getNextValue(data.index++)}bits|=(resb>0?1:0)*power;power<<=1}dictionary[dictSize++]=f(bits);c=dictSize-1;enlargeIn--;break;case 2:return result.join("")}if(enlargeIn==0){enlargeIn=Math.pow(2,numBits);numBits++}if(dictionary[c]){entry=dictionary[c]}else{if(c===dictSize){entry=w+w.charAt(0)}else{return null}}result.push(entry);dictionary[dictSize++]=w+entry.charAt(0);enlargeIn--;if(enlargeIn==0){enlargeIn=Math.pow(2,numBits);numBits++}w=entry}return result.join("")}}; return LZString})();</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap');
@@ -1755,6 +1755,37 @@ setTimeout(function(){gerarProdutosDasPrestacoes();},500);
   if(changed)DB.s('collabs',cols);
 })();
 go('dash');
+// Carregar PDFs comprimidos após LZString estar disponível
+// Carregar cardápios — tenta até LZString estar disponível
+var _cardLoadAttempts=0;
+function loadCardPdfs(){
+  _cardLoadAttempts++;
+  if(typeof LZString==='undefined'){
+    if(_cardLoadAttempts<20)setTimeout(loadCardPdfs,500);
+    else console.warn('LZString não carregou após 10s');
+    return;
+  }
+  if(!window._cPdfs)window._cPdfs={};
+  var cards=DB.g('cardapios');
+  var loaded=0;
+  cards.forEach(function(cd){
+    var compressed=localStorage.getItem('cda_card_pdf_'+cd.cv_id);
+    if(!compressed)return;
+    try{
+      var b64=LZString.decompressFromUTF16(compressed);
+      if(!b64)return;
+      window._cPdfs[cd.cv_id]=b64;
+      loaded++;
+    }catch(e){console.warn('Cardápio '+cd.cv_id+':',e);}
+  });
+  console.log('Cardápios carregados: '+loaded+'/'+cards.length);
+  if(cards.length>0&&loaded===0){
+    setTimeout(function(){
+      toast('⚠ Cardápios não encontrados. Restaure um backup ou reimporte os PDFs.','');
+    },1500);
+  }
+}
+setTimeout(loadCardPdfs,1000);
 
 function gerarProdutosDasPrestacoes(){
   const prs=DB.g('prestacoes');
@@ -1865,13 +1896,23 @@ function expCliXLSX(){
 
 function backupSistema(){
   var d={};
-  for(var k in localStorage){if(k.startsWith('cda_')){try{d[k]=JSON.parse(localStorage[k]);}catch(e){d[k]=localStorage[k];}}}
+  for(var k in localStorage){
+    if(k.startsWith('cda_')){
+      // PDFs comprimidos guardar como string direta
+      if(k.startsWith('cda_card_pdf_')){
+        d[k]=localStorage.getItem(k);
+      } else {
+        try{d[k]=JSON.parse(localStorage[k]);}catch(e){d[k]=localStorage[k];}
+      }
+    }
+  }
   d['_dt']=new Date().toLocaleString('pt-BR');
+  var json=JSON.stringify(d);
   var a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([JSON.stringify(d)],{type:'application/json'}));
+  a.href=URL.createObjectURL(new Blob([json],{type:'application/json'}));
   a.download='backup_'+new Date().toISOString().slice(0,10)+'.json';
-  a.click();
-  toast('Backup salvo!','ok');
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  toast('Backup salvo (inclui cardápios)!','ok');
 }
 function restaurarBackup(el){
   var f=el.files[0];if(!f)return;
@@ -1881,7 +1922,15 @@ function restaurarBackup(el){
     try{
       var d=JSON.parse(e.target.result);
       for(var k in localStorage){if(k.startsWith('cda_'))localStorage.removeItem(k);}
-      for(var k in d){if(k.startsWith('cda_'))localStorage.setItem(k,JSON.stringify(d[k]));}
+      for(var k in d){
+        if(!k.startsWith('cda_'))continue;
+        if(k.startsWith('cda_card_pdf_')){
+          // PDFs: salvar string direta sem JSON.stringify
+          localStorage.setItem(k,d[k]);
+        } else {
+          localStorage.setItem(k,JSON.stringify(d[k]));
+        }
+      }
       toast('Restaurado! Recarregando...','ok');
       setTimeout(function(){location.reload();},1500);
     }catch(e){toast('Erro: '+e.message);}
@@ -1892,26 +1941,6 @@ function restaurarBackup(el){
 var _cpUrl=null;
 function rCardapios(){
   if(!window._cPdfs)window._cPdfs={};
-(function loadCardPdfs(){
-  try{
-    var cards=DB.g('cardapios');
-    cards.forEach(function(cd){
-      var compressed=localStorage.getItem('cda_card_pdf_'+cd.cv_id);
-      if(!compressed)return;
-      try{
-        var b64=LZString.decompressFromUTF16(compressed);
-        if(!b64)return;
-        var arr=b64.split(',');
-        var byteStr=atob(arr[1]);
-        var ab=new ArrayBuffer(byteStr.length);
-        var ia=new Uint8Array(ab);
-        for(var i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
-        var blob=new Blob([ab],{type:'application/pdf'});
-        window._cPdfs[cd.cv_id]=URL.createObjectURL(blob);
-      }catch(e){console.warn('Cardápio '+cd.cv_id+' não carregado:',e);}
-    });
-  }catch(e){}
-})();
   var cvs=getCVS();
   var cards=DB.g('cardapios');
   var tbody=document.getElementById('card-tb');
@@ -1975,10 +2004,17 @@ function saveCardapio(){
       if(idx>=0)cards[idx]=obj;else cards.push(obj);
       DB.s('cardapios',cards);
       if(window._cPdfs[cvId])URL.revokeObjectURL(window._cPdfs[cvId]);
-      window._cPdfs[cvId]=_cpUrl;
-      _cpUrl=null;window._cpFile=null;
+      window._cPdfs[cvId]=b64;
+      if(_cpUrl){URL.revokeObjectURL(_cpUrl);_cpUrl=null;}
+      window._cpFile=null;
       closeMo('mo-card');rCardapios();
-      toast('Cardápio salvo! ('+sizeMB+'MB comprimido)','ok');
+      toast('Cardápio salvo! Fazendo backup automático...','ok');
+      // Backup automático
+      setTimeout(function(){backupSistema();},500);
+      // Destacar botão backup
+      var bkBtn=document.querySelector('[onclick="backupSistema()"]');
+      if(bkBtn){bkBtn.style.background='var(--rust)';bkBtn.style.color='#fff';
+        setTimeout(function(){bkBtn.style.background='';bkBtn.style.color='';},5000);}
     }catch(err){
       console.error('Erro saveCardapio:',err);
       toast('Erro: '+err.message);
@@ -2001,7 +2037,12 @@ function reimpCardapio(cvId){
 }
 function verCardapio(cvId){
   if(!window._cPdfs||!window._cPdfs[cvId]){toast('Use Reimportar para carregar o PDF.');return;}
-  window.open(window._cPdfs[cvId],'_blank');
+  var b64=window._cPdfs[cvId];
+  var win=window.open('','_blank');
+  if(win){
+    win.document.write('<html><body style="margin:0;overflow:hidden"><embed src="'+b64+'" type="application/pdf" width="100%" height="100%" style="position:fixed;top:0;left:0;width:100%;height:100%"></body></html>');
+    win.document.close();
+  }
 }
 function delCardapio(cvId){
   if(!confirm('Deletar cardápio?'))return;
@@ -2012,7 +2053,20 @@ function delCardapio(cvId){
 }
 
 function printComCardapio(cvId){
-  var temCardapio=window._cPdfs&&window._cPdfs[cvId];
+  if(!window._cPdfs)window._cPdfs={};
+  // Tentar pelo cv_id direto
+  var temCardapio=window._cPdfs[cvId];
+  // Se não achou, tentar pelo cv_id dos cardápios cadastrados
+  if(!temCardapio){
+    var cards=DB.g('cardapios');
+    var card=cards.find(function(cd){return String(cd.cv_id)===String(cvId);});
+    if(card)temCardapio=window._cPdfs[card.cv_id];
+    // Se ainda não achou, pegar o primeiro disponível
+    if(!temCardapio){
+      var keys=Object.keys(window._cPdfs);
+      if(keys.length>0)temCardapio=window._cPdfs[keys[0]];
+    }
+  }
   if(!temCardapio){window.print();return;}
   
   // Renderizar PDF como canvas usando PDF.js
@@ -2030,7 +2084,10 @@ function printComCardapio(cvId){
   
   toast('Preparando cardápio para impressão...','ok');
   
-  pdfjsLib.getDocument(window._cPdfs[cvId]).promise.then(function(pdf){
+  var _pdfSrc=temCardapio;
+  var _pdfArg=(_pdfSrc&&_pdfSrc.startsWith('data:application/pdf'))?
+    {data:atob(_pdfSrc.split(',')[1])}:_pdfSrc;
+  pdfjsLib.getDocument(_pdfArg).promise.then(function(pdf){
     var totalPages=pdf.numPages;
     var pagesRendered=0;
     
