@@ -921,7 +921,7 @@ function rPrestList(){
   });
   const cnt=document.getElementById('prest-cnt');
   if(cnt)cnt.textContent=filtered.length+' prestação(ões)';
-  document.getElementById('prest-list').innerHTML=`<div class="tw"><div class="th"><h3>Histórico</h3></div><div class="ts"><table><thead><tr><th>Artista / Collab</th><th>Canal(is)</th><th>Mês Ref.</th><th>Peças</th><th>Valor Líquido</th><th>Comissão Devida</th><th>Status</th><th>Ações</th></tr></thead><tbody>${filtered.map(p=>{const c=calcP(p);const canaisStr=(p.secoes||[]).map(s=>s.canal).join(', ')||(p.canal||'');return`<tr><td><b>${p.collab_nome}</b></td><td><span class="badge b-vio" style="font-size:9px">${canaisStr}</span></td><td class="mn">${mesLabel(p.mes)}</td><td class="mn">${c.qtde}</td><td class="mn" style="color:var(--gold);font-weight:700">${R(c.subtotal+c.frete)}</td><td class="mn tg">${R(c.com)}</td><td><span class="badge b-sage">Importada</span></td><td style="display:flex;gap:5px"><button class="btn sm rust" onclick="verPrest(${p.id})">Ver</button><button class="btn sm" onclick="delPrest(${p.id})" title="Deletar">🗑</button></td></tr>`;}).join('')}</tbody></table></div></div>`;
+  document.getElementById('prest-list').innerHTML=`<div class="tw"><div class="th"><h3>Histórico</h3></div><div class="ts"><table><thead><tr><th>Artista / Collab</th><th>Canal(is)</th><th>Mês Ref.</th><th>Peças</th><th>Valor Líquido</th><th>Comissão Devida</th><th>Status</th><th>Ações</th></tr></thead><tbody>${filtered.map(p=>{const c=calcP(p);const canaisStr=(p.secoes||[]).map(s=>s.canal).join(', ')||(p.canal||'');return`<tr><td><b>${p.collab_nome}</b></td><td><span class="badge b-vio" style="font-size:9px">${canaisStr}</span></td><td class="mn">${mesLabel(p.mes)}</td><td class="mn">${c.qtde}</td><td class="mn" style="color:var(--gold);font-weight:700">${R(c.subtotal+c.frete)}</td><td class="mn tg">${R(c.com)}</td><td><span class="badge b-sage">Importada</span>${p.obs_mes?`<span class="badge b-gd" style="margin-left:4px;font-size:9px">${p.obs_mes}</span>`:''}</td><td style="display:flex;gap:5px"><button class="btn sm rust" onclick="verPrest(${p.id})">Ver</button><button class="btn sm" onclick="delPrest(${p.id})" title="Deletar">🗑</button></td></tr>`;}).join('')}</tbody></table></div></div>`;
 }
 
 function verPrest(id){
@@ -953,7 +953,17 @@ function verPrest(id){
       <div class="kpi gd"><div class="kpi-l">Total Líquido</div><div class="kpi-v">${R(c.subtotal+c.frete)}</div><div class="kpi-s">total vendido − desconto</div></div>
       <div class="kpi vi"><div class="kpi-l">Total Deduções</div><div class="kpi-v">${R(c.totDesc)}</div><div class="kpi-s">frete + imposto + descontos</div></div>
       <div class="kpi"><div class="kpi-l">Valor Base Comissão</div><div class="kpi-v">${R(c.liq)}</div><div class="kpi-s">valor total líquido − deduções</div></div>
-      <div class="kpi sa"><div class="kpi-l">Comissão Devida</div><div class="kpi-v">${R(c.com)}</div><div class="kpi-s">${p.cfg.comissao}% s/ líquido</div></div>
+      <div class="kpi sa"><div class="kpi-l">Comissão Devida Mês</div><div class="kpi-v">${R(c.com)}</div><div class="kpi-s">${c.secoes?c.secoes.map(s=>s.pct_com+'% s/ líquido').join(' · '):(p.cfg?p.cfg.comissao+'% s/ líquido':'')}</div></div>
+      <div class="kpi" style="border:2px solid var(--gold)">
+        <div class="kpi-l">Saldo Comissão Mês Anterior</div>
+        <div class="kpi-v" id="kpi-saldo-ant" style="color:${(p.saldo_anterior||0)<0?'var(--rust)':(p.saldo_anterior||0)>0?'var(--sage)':'var(--ink)'}">${(p.saldo_anterior||0)===0?'R$ 0,00':((p.saldo_anterior||0)>0?'+':'')+R(p.saldo_anterior||0)}</div>
+        <div class="kpi-s">${(p.saldo_anterior||0)>0?'credor':(p.saldo_anterior||0)<0?'devedor':'neutro'}</div>
+      </div>
+      <div class="kpi" style="border:2px solid var(--rust)">
+        <div class="kpi-l">Saldo Final Devido Comissão</div>
+        <div class="kpi-v" style="color:var(--rust);font-weight:900">${R(c.com+(p.saldo_anterior||0))}</div>
+        <div class="kpi-s">Comissão Mês ${(p.saldo_anterior||0)>=0?'+':''} Saldo Anterior</div>
+      </div>
     </div>
     <div class="ch-g">
       <div class="ch-c"><div class="ch-t">Receita por Produto (R$)</div><div class="bl">${pArr.map(([n,d],i)=>`<div><div class="bi-l"><span style="font-size:10px">${n}</span><span>${d.q}pç · ${R(d.t)}</span></div><div class="bt"><div class="bf ${COLS[i%6]}" style="width:${(d.t/mxP*100).toFixed(1)}%"></div></div></div>`).join('')}</div></div>
@@ -999,7 +1009,27 @@ function verPrest(id){
       ${c.op>0?`<div class="fr"><div class="fl">Desconto Operacional<small>${c.secoes.filter(s=>s.pct_op>0).map(s=>s.canal+': '+s.pct_op+'%').join(' · ')}</small></div><div class="fv neg">− ${R(c.op)}</div></div>`:''}
       ${c.cs>0?`<div class="fr"><div class="fl">Desconto Casas de Shows<small>${c.secoes.filter(s=>s.pct_cs>0).map(s=>s.canal+': '+s.pct_cs+'%').join(' · ')}</small></div><div class="fv neg">− ${R(c.cs)}</div></div>`:''}
       <div class="fr sub"><div class="fl">Valor Base de Comissão<small>(Total Líquido − Total Deduções)</small></div><div class="fv">${R(c.liq)}</div></div>
-      <div class="fr tot"><div class="fl">COMISSÃO DEVIDA TOTAL<small>${c.secoes.map(s=>s.canal+': '+s.pct_com+'%').join(' · ')}</small></div><div class="fv big">${R(c.com)}</div></div>
+      <div class="fr tot"><div class="fl">COMISSÃO DEVIDA MÊS<small>${c.secoes.map(s=>s.canal+': '+s.pct_com+'%').join(' · ')}</small></div><div class="fv big">${R(c.com)}</div></div>
+      <div class="fr" style="background:#fdf3dc;border-top:2px solid var(--gold)">
+        <div class="fl">Saldo Comissão Mês Anterior<small>positivo=credor · negativo=devedor</small></div>
+        <div class="fv">
+          <input type="number" step="0.01" id="inp-saldo-ant" value="${p.saldo_anterior||0}"
+            style="width:120px;text-align:right;border:2px solid var(--gold);padding:4px 8px;font-family:inherit;font-size:13px"
+            onchange="salvarCamposPrest('${p.id}')">
+        </div>
+      </div>
+      <div class="fr tot" style="background:#f0ece4">
+        <div class="fl">SALDO FINAL DEVIDO COMISSÃO MÊS</div>
+        <div class="fv big" id="saldo-final-display">${R(c.com+(p.saldo_anterior||0))}</div>
+      </div>
+    </div>
+    <div class="fgr" style="margin-top:16px;grid-column:1/-1">
+      <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px">Observações do Mês</label>
+      <input type="text" id="inp-obs-mes" maxlength="50" value="${p.obs_mes||''}"
+        placeholder="Até 50 caracteres..."
+        style="width:100%;border:2px solid var(--ink);padding:8px 12px;font-family:inherit;font-size:13px;margin-top:4px"
+        onchange="salvarCamposPrest('${p.id}')">
+      <div style="text-align:right;font-size:10px;color:var(--muted);margin-top:2px">${(p.obs_mes||'').length}/50</div>
     </div>
     <div class="tw">
       <div class="th"><h3>Itens Vendidos — Detalhamento</h3></div>
@@ -1241,8 +1271,12 @@ function doImport(){
       collab_id:secoesResolvidas[0].canal_id,
       cfg:secoesResolvidas[0].cfg,
       itens:secoesResolvidas.flatMap(s=>s.itens),
-      secoes:secoesResolvidas
+      secoes:secoesResolvidas,
+      saldo_anterior:0,
+      obs_mes:''
     };
+    // Snapshot dos valores calculados
+    try{const snap=calcP(prestacao);prestacao.snap={tot:snap.tot,descTotal:snap.descTotal,subtotal:snap.subtotal,frete:snap.frete,imp:snap.imp,op:snap.op,cs:snap.cs,totDesc:snap.totDesc,liq:snap.liq,com:snap.com,qtde:snap.qtde};}catch(e){}
     // Substituir ou inserir
     const canaisNovos=secoesResolvidas.map(s=>s.canal.trim().toLowerCase());
     const idxExist=prs.findIndex(p=>{
@@ -1253,8 +1287,11 @@ function doImport(){
       if((p.secoes||[]).some(s=>canaisNovos.includes((s.canal||'').trim().toLowerCase())))return true;
       return false;
     });
+    // Preservar campos manuais se existir prestação anterior
     if(idxExist>=0){
       prestacao.id=prs[idxExist].id;
+      prestacao.saldo_anterior=prs[idxExist].saldo_anterior||0;
+      prestacao.obs_mes=prs[idxExist].obs_mes||'';
       prs[idxExist]=prestacao;
       // Remover duplicatas remanescentes
       prs=prs.filter((p,i)=>{
@@ -2146,6 +2183,29 @@ function abrirCardapioCV(cvId){
     toast('Cardápio não disponível. Reimporte em Cardápios.');return;
   }
   window.open(window._cPdfs[cvId],'_blank');
+}
+
+function salvarCamposPrest(id){
+  var prs=DB.g('prestacoes');
+  var idx=prs.findIndex(function(x){return x.id==id;});
+  if(idx<0)return;
+  var saldo=parseFloat(document.getElementById('inp-saldo-ant').value)||0;
+  var obs=(document.getElementById('inp-obs-mes').value||'').slice(0,50);
+  prs[idx].saldo_anterior=saldo;
+  prs[idx].obs_mes=obs;
+  // Atualizar snapshot
+  try{var snap=calcP(prs[idx]);prs[idx].snap={tot:snap.tot,descTotal:snap.descTotal,subtotal:snap.subtotal,frete:snap.frete,imp:snap.imp,totDesc:snap.totDesc,liq:snap.liq,com:snap.com,qtde:snap.qtde};}catch(e){}
+  DB.s('prestacoes',prs);
+  // Atualizar display saldo final
+  var c=calcP(prs[idx]);
+  var sf=document.getElementById('saldo-final-display');
+  if(sf)sf.textContent=R(c.com+saldo);
+  var kpiSaldo=document.getElementById('kpi-saldo-ant');
+  if(kpiSaldo)kpiSaldo.textContent=saldo===0?'R$ 0,00':(saldo>0?'+':'')+R(saldo);
+  // Atualizar contador obs
+  var obsCounter=document.querySelector('#inp-obs-mes+div');
+  if(obsCounter)obsCounter.textContent=obs.length+'/50';
+  toast('Salvo!','ok');
 }
 
 </script>
